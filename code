@@ -1,0 +1,108 @@
+#This code should work when copied and pasted into a JupyterLyte notebook
+import numpy as np
+import matplotlib.pyplot as plt
+rng = np.random.default_rng()
+
+#Variables that can be changed
+N = 50
+runs = 100000
+absolute = 0
+#'N' and 'runs' should be positive integers
+#Absolute determines if |a-b| or a-b is used; absolute = 0 is |a-b|, otherwise a-b is used
+
+startruns = runs
+if absolute == 0:
+    print("Here are the", startruns, "final numbers for the", N, "hat:")
+else:
+    print("Here are the", startruns, "final numbers for the modified", N, "hat:")
+
+#Setting up arrays
+helloworld = np.arange(0, runs)
+finalarray = np.zeros_like(helloworld)
+howmanythousands = 0
+
+while runs>0:
+#Creating the n-hat
+    P = np.arange(0, N)
+    hat = np.zeros_like(P)
+    i = 0
+    while i<N:
+        hat[i] = i+1
+        i = i+1
+    
+    T = N
+
+#Applying the operation
+    while T>1:
+        k1 = rng.integers(0, T) +1
+        k2 = rng.integers(0, T) +1
+        
+        if k1 == k2:
+            k2 = k2+1
+            if k2>T:
+                k2 = k2-T
+
+        hat[k1-1] = hat[k2-1] - hat[k1-1]
+        hat[k2-1] = 0
+
+        if absolute == 0:
+            if hat[k1-1]<0:
+                hat[k1-1] = -hat[k1-1]
+            
+#Creating the child hat    
+        P = np.arange(0, T-1)
+        childhat = np.zeros_like(P)
+
+        j = 0
+        while j<T-1:
+            if j< k2-1:
+                childhat[j] = hat[j]
+            else:
+                childhat[j] = hat[j+1]
+            j = j+1
+
+        hat = childhat
+        T = T-1
+
+    finalnumber = hat[0]
+    finalarray[startruns-runs] = finalnumber
+    runs = runs-1
+#Checks how many runs are done, so I could get an estimate as to how long the program would take
+    if startruns-runs <1000 and startruns <1000:
+        print(startruns-runs, "done")
+    if runs % 1000 == 0:
+        howmanythousands = howmanythousands + 1
+        print(howmanythousands, "thousand done")
+
+print(finalarray)
+
+#Checking how many of each final number there are
+AEIOU = -N
+xy = np.arange(0, N+1)
+graphx = np.zeros_like(xy)
+graphy = np.zeros_like(xy)
+imrunningoutofvariablenames = 0
+while imrunningoutofvariablenames < N+1:
+    graphx[imrunningoutofvariablenames] = imrunningoutofvariablenames
+    imrunningoutofvariablenames = imrunningoutofvariablenames + 1
+while AEIOU <N+1:
+    BFJPV = 0
+    noof = 0
+    while BFJPV<startruns:
+        if finalarray[BFJPV] == AEIOU:
+            noof = noof+1
+        BFJPV = BFJPV + 1
+    if noof>0:
+        print("The final number", AEIOU, "appeared", noof, "times.")
+#The two hashed out lines of code were to plot the graph in figure 5 i.e. to determine that the distribution was normal
+    if AEIOU == 0:
+        noof = noof*2
+    graphy[AEIOU] = noof
+    AEIOU = AEIOU + 1
+
+#Plotting the graph
+plt.scatter(graphx, graphy, s=1)
+plt.title("Final numbers")
+plt.xlabel("Final number")
+plt.ylabel("Frequency")
+plt.show()
